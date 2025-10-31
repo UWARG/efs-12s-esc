@@ -1,4 +1,0 @@
-../Core/Src/firmware/Drv8323rs.cpp:11:6:void Drv8323rs::init()	8	static
-../Core/Src/firmware/Drv8323rs.cpp:15:6:bool Drv8323rs::read_fault()	8	static
-../Core/Src/firmware/Drv8323rs.cpp:19:6:void Drv8323rs::reset_fault_hw()	16	static
-../Core/Src/firmware/Drv8323rs.cpp:29:6:void Drv8323rs::sleep(bool)	16	static

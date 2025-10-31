@@ -22,6 +22,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "firmware/Drv8323rs.hpp"
+#include "firmware/Stm32f05.hpp"
 
 /* USER CODE END Includes */
 
@@ -43,6 +44,8 @@
 /* Private variables ---------------------------------------------------------*/
 ADC_HandleTypeDef hadc;
 
+SPI_HandleTypeDef hspi1;
+
 TIM_HandleTypeDef htim1;
 
 /* USER CODE BEGIN PV */
@@ -54,6 +57,7 @@ void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_ADC_Init(void);
 static void MX_TIM1_Init(void);
+static void MX_SPI1_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -81,6 +85,7 @@ int main(void)
 
   /* USER CODE BEGIN Init */
 
+
   /* USER CODE END Init */
 
   /* Configure the system clock */
@@ -94,7 +99,20 @@ int main(void)
   MX_GPIO_Init();
   MX_ADC_Init();
   MX_TIM1_Init();
+  MX_SPI1_Init();
   /* USER CODE BEGIN 2 */
+  Stm32f05::init();
+  Stm32f05::set_led_1(true);
+  Stm32f05::set_led_2(false);
+  Stm32f05::set_led_3(false);
+  Drv8323rs::init(hspi1);
+  Drv8323rs::set_pwm_mode(Drv8323rs::PwmControlMode::INDEPENDENT);
+  Drv8323rs::set_phase_b_high(Drv8323rs::FetState::OPEN);
+  Drv8323rs::set_phase_b_low(Drv8323rs::FetState::CLOSE);
+  Drv8323rs::set_phase_c_high(Drv8323rs::FetState::OPEN);
+  Drv8323rs::set_phase_c_low(Drv8323rs::FetState::CLOSE);
+  Drv8323rs::reset_fault_hw();
+
 
   /* USER CODE END 2 */
 
@@ -102,6 +120,17 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+	  Drv8323rs::set_phase_a_high(Drv8323rs::FetState::CLOSE);
+	  Drv8323rs::set_phase_a_low(Drv8323rs::FetState::OPEN);
+	  Stm32f05::set_led_2(true);
+	  HAL_Delay(2e3);
+	  Drv8323rs::set_phase_a_high(Drv8323rs::FetState::OPEN);
+	  Drv8323rs::set_phase_a_low(Drv8323rs::FetState::CLOSE);
+	  Stm32f05::set_led_2(false);
+	  HAL_Delay(2e3);
+	  Stm32f05::set_led_3(Drv8323rs::has_fault());
+	  Drv8323rs::DriverFaults faults = Drv8323rs::get_faults();
+	  Drv8323rs::reset_fault_hw();
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -249,6 +278,46 @@ static void MX_ADC_Init(void)
 }
 
 /**
+  * @brief SPI1 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_SPI1_Init(void)
+{
+
+  /* USER CODE BEGIN SPI1_Init 0 */
+
+  /* USER CODE END SPI1_Init 0 */
+
+  /* USER CODE BEGIN SPI1_Init 1 */
+
+  /* USER CODE END SPI1_Init 1 */
+  /* SPI1 parameter configuration*/
+  hspi1.Instance = SPI1;
+  hspi1.Init.Mode = SPI_MODE_MASTER;
+  hspi1.Init.Direction = SPI_DIRECTION_2LINES;
+  hspi1.Init.DataSize = SPI_DATASIZE_16BIT;
+  hspi1.Init.CLKPolarity = SPI_POLARITY_LOW;
+  hspi1.Init.CLKPhase = SPI_PHASE_1EDGE;
+  hspi1.Init.NSS = SPI_NSS_SOFT;
+  hspi1.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_16;
+  hspi1.Init.FirstBit = SPI_FIRSTBIT_MSB;
+  hspi1.Init.TIMode = SPI_TIMODE_DISABLE;
+  hspi1.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
+  hspi1.Init.CRCPolynomial = 7;
+  hspi1.Init.CRCLength = SPI_CRC_LENGTH_DATASIZE;
+  hspi1.Init.NSSPMode = SPI_NSS_PULSE_ENABLE;
+  if (HAL_SPI_Init(&hspi1) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN SPI1_Init 2 */
+
+  /* USER CODE END SPI1_Init 2 */
+
+}
+
+/**
   * @brief TIM1 Initialization Function
   * @param None
   * @retval None
@@ -371,22 +440,6 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
-
-  /*Configure GPIO pin : PA15 */
-  GPIO_InitStruct.Pin = GPIO_PIN_15;
-  GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
-  GPIO_InitStruct.Alternate = GPIO_AF0_SPI1;
-  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
-
-  /*Configure GPIO pins : PB3 PB4 PB5 */
-  GPIO_InitStruct.Pin = GPIO_PIN_3|GPIO_PIN_4|GPIO_PIN_5;
-  GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
-  GPIO_InitStruct.Alternate = GPIO_AF0_SPI1;
-  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
   /*Configure GPIO pins : PB6 PB7 */
   GPIO_InitStruct.Pin = GPIO_PIN_6|GPIO_PIN_7;
