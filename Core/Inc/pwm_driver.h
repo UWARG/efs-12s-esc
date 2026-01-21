@@ -1,13 +1,25 @@
-/*
- * pwm_driver.h
- *
- *  Created on: Oct 9, 2025
- *      Author: dchae
- */
+#ifndef PWM_DRIVER_H
+#define PWM_DRIVER_H
 
-#ifndef INC_PWM_DRIVER_H_
-#define INC_PWM_DRIVER_H_
+#include <stdint.h>
+#include <stdbool.h>
+#include "bemf.h"
 
+/* ========= API ========= */
 
+/* Initialize TIM1 PWM + GPIOs */
+void pwm_init(void);
 
-#endif /* INC_PWM_DRIVER_H_ */
+/* Disable all phases immediately */
+void pwm_all_off(void);
+
+/* Set duty cycle (0–1000) */
+void pwm_set_duty(uint16_t duty);
+
+/* Enable phase as HIGH-side driven */
+void pwm_set_phase_state(phase_t phase, bool high_side);
+
+/* Float a phase (both HS and LS off) */
+void pwm_set_phase_floating(phase_t phase);
+
+#endif /* PWM_DRIVER_H */
