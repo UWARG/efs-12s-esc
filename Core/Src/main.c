@@ -102,7 +102,7 @@ int main(void)
   SystemClock_Config();
 
   /* USER CODE BEGIN SysInit */
-  system_safe_init();
+
   /* USER CODE END SysInit */
 
   /* Initialize all configured peripherals */
@@ -115,7 +115,6 @@ int main(void)
   /* USER CODE BEGIN 2 */
   pwm_all_off();
   drv_spi_clear_fault();   // gate driver EN low
-  // safety_init();
 
   dshot_init();
 
@@ -129,9 +128,6 @@ int main(void)
   HAL_TIMEx_PWMN_Start(&htim1, TIM_CHANNEL_1);
   HAL_TIMEx_PWMN_Start(&htim1, TIM_CHANNEL_2);
   HAL_TIMEx_PWMN_Start(&htim1, TIM_CHANNEL_3);
-
-/* ADC already started */
-
 
   /* USER CODE END 2 */
 
