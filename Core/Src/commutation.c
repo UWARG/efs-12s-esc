@@ -12,6 +12,9 @@
 /* Blanking time after commutation before BEMF valid */
 #define COMMUTATION_BLANKING_TICKS  200
 
+#define THROTTLE_MINIMUM_START   48  /* Minimum throttle to start motor */
+#define THROTTLE_MAXIMUM        2047
+
 /* ========= Internal State ========= */
 
 static comm_step_t step;
@@ -148,9 +151,9 @@ void commutation_update(uint32_t now_ticks)
 
     /* -------- Closed-loop -------- */
     else if (state == MOTOR_CLOSED_LOOP) {
-        /* Nothing here:
-         * commutation is driven by BEMF zero-cross
-         */
+        if ((int32_t)(now_ticks - next_comm_ticks) >= 0) {
+            advance_step();
+        }
     }
 }
 
@@ -159,17 +162,48 @@ void commutation_on_zc(uint32_t zc_ticks)
     if (state != MOTOR_CLOSED_LOOP)
         return;
 
-    /* Enforce blanking time */
     if ((zc_ticks - last_comm_ticks) < COMMUTATION_BLANKING_TICKS)
         return;
 
-    /* Electrical 30° delay:
-     * next_step_time = zc + (zc - last_zc)
-     */
-    uint32_t delay = zc_ticks - last_zc_ticks;
+    if (last_zc_ticks == 0) {
+        last_zc_ticks = zc_ticks;
+        return; // need two ZCs to estimate speed
+    }
+
+    uint32_t T60 = zc_ticks - last_zc_ticks;
+    uint32_t T30 = T60 / 2;
+
     last_zc_ticks = zc_ticks;
+    next_comm_ticks = zc_ticks + T30;
+}
 
-    next_comm_ticks = zc_ticks + delay;
+void commutation_reset(void)
+{
+    commutation_stop();
+    commutation_init();
+}
 
-    advance_step();
+static uint16_t throttle_to_duty(uint16_t t)
+{
+    if (t < THROTTLE_MINIMUM_START)
+        return 0;
+
+    t -= THROTTLE_MINIMUM_START; // normalize
+    return (t * PWM_MAX_DUTY) / (THROTTLE_MAXIMUM - THROTTLE_MINIMUM_START);
+}
+
+void commutation_set_throttle(uint16_t throttle)
+{
+    /* For now: map throttle to startup */
+    if (throttle == 0) {
+        commutation_stop();
+        return;
+    }
+
+    if (state == MOTOR_STOPPED) {
+        commutation_start();
+    }
+
+    uint16_t duty = throttle_to_duty(throttle);
+    pwm_set_duty(duty);
 }

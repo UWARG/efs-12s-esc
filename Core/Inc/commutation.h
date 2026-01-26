@@ -25,6 +25,14 @@ typedef enum {
     MOTOR_FAULT
 } motor_state_t;
 
+typedef enum {
+    ESC_DISARMED,
+    ESC_ARMING,
+    ESC_RUNNING,
+    ESC_FAULT
+} esc_state_t;
+
+
 /* ========= API ========= */
 
 /* Initialize commutation module */
