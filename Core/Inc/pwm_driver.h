@@ -5,6 +5,9 @@
 #include <stdbool.h>
 #include "bemf.h"
 
+
+#define PWM_MAX_DUTY     1000
+#define PWM_TIMER       TIM1
 /* ========= API ========= */
 
 /* Initialize TIM1 PWM + GPIOs */

@@ -3,8 +3,7 @@
 
 /* ========= Configuration ========= */
 
-#define PWM_MAX_DUTY     1000
-#define PWM_TIMER       TIM1
+
 
 /* ========= External Handles ========= */
 extern TIM_HandleTypeDef htim1;
