@@ -21,7 +21,6 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "system_init.h"
 #include "pwm_driver.h"
 #include "drv_spi.h"
 #include "safety.h"

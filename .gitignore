@@ -21,3 +21,4 @@ build/
 .DS_Store
 Thumbs.db
 .vscode/
+.settings/stm32cubeide.project.prefs
