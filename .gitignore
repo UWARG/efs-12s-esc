@@ -1,0 +1,23 @@
+# STM32CubeIDE build outputs
+Debug/
+Release/
+build/
+
+# Object files
+*.o
+*.d
+*.elf
+*.map
+*.hex
+*.bin
+*.lst
+
+# Eclipse / CubeIDE metadata
+.metadata/
+.settings/
+*.launch
+
+# OS junk
+.DS_Store
+Thumbs.db
+.vscode/
