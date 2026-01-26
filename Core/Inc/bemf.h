@@ -4,6 +4,8 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+#define ADC_NUM_CHANNELS 7
+
 /* Motor phases */
 typedef enum {
     PHASE_A = 0,
@@ -20,15 +22,13 @@ typedef struct {
 
 /* ADC sample layout (MUST match ADC DMA layout) */
 typedef struct {
-    uint16_t a_vsense;
-    uint16_t b_vsense;
-    uint16_t c_vsense;
-
-    uint16_t a_isense;
-    uint16_t b_isense;
-    uint16_t c_isense;
-
-    uint16_t bus_vsense;
+    uint16_t c_vsense;   // IN0
+    uint16_t bus_vsense; // IN1
+    uint16_t b_vsense;   // IN4
+    uint16_t a_vsense;   // IN5
+    uint16_t a_isense;   // IN11
+    uint16_t b_isense;   // IN12
+    uint16_t c_isense;   // IN13
 } adc_sample_t;
 
 /* Initialize BEMF module */
